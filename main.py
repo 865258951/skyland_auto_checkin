@@ -13,6 +13,7 @@ import os
 import re
 import time
 from urllib import parse
+from plugin.NotifyWind import NotifyWind
 
 # 账号等待间隔（秒）
 ACCOUNT_INTERVAL = 1
@@ -134,19 +135,32 @@ class SkylandCheckin:
         """添加消息到运行消息"""
         self._run_message += msg + "\n"
 
+    # def send_notify(self, title, content):
+    #     """
+    #     通知推送
+    #     使用青龙推送脚本
+    #     """
+    #     import notify
+
+    #     if self._config.enable_notify:
+    #         # 禁用控制台输出，避免重复打印签到日志
+    #         notify.push_config['CONSOLE'] = False
+    #         # 推送的通知内容大概率不是等宽显示而无法对齐，那就删掉多余空格制表符好了
+    #         content = re.sub(r'[ \t]+', ' ', content)
+    #         notify.send(title, content)
     def send_notify(self, title, content):
         """
-        通知推送
-        使用青龙推送脚本
+        使用 NotifyWind 推送通知
         """
-        import notify
-
         if self._config.enable_notify:
-            # 禁用控制台输出，避免重复打印签到日志
-            notify.push_config['CONSOLE'] = False
-            # 推送的通知内容大概率不是等宽显示而无法对齐，那就删掉多余空格制表符好了
-            content = re.sub(r'[ \t]+', ' ', content)
-            notify.send(title, content)
+            try:
+                # 清理内容格式（移除多余的制表符和空格，但保留换行）
+                clean_content = re.sub(r'[ \t]+', ' ', content)
+                # 发送通知
+                NotifyWind(title=title, message=clean_content)
+                print(f"通知推送成功：{title}")
+            except Exception as e:
+                print(f"通知推送失败：{str(e)}")
 
     def generate_sign(self, path, body):
         """生成接口签名"""
@@ -346,6 +360,8 @@ class SkylandCheckin:
             print(complete_msg)
             if idx < total_tokens:
                 time.sleep(ACCOUNT_INTERVAL)  # 账号等待间隔
+        # if self.run_message:
+        #     self.send_notify("森空岛每日签到结果", self.run_message)
         if self.run_message:
             self.send_notify("森空岛每日签到结果", self.run_message)
 
