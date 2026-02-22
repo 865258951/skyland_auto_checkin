@@ -211,6 +211,7 @@
 7. 配置任务计划
 
     1. 在开始菜单搜索“任务计划程序”，打开
+    
         <img width="781" height="783" alt="image" src="https://github.com/user-attachments/assets/b35a542f-c77b-4fa0-94c1-520bb766b8f1" />
 
     2. 在右侧选择新建任务
